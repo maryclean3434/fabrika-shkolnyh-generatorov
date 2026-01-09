@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Тест по математике 1 класс</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .quiz-wrapper {
+      background: #ffffff;
+      max-width: 640px;
+      width: 100%;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+      padding: 20px 18px 24px;
+    }
+    h1 {
+      font-size: 1.4rem;
+      margin: 0 0 6px;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+    .progress {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 10px;
+    }
+    .question-box {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 14px 12px;
+      margin-bottom: 14px;
+      border: 1px solid #e5e7eb;
+    }
+    .question-text {
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+    .note {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+    .option-btn {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.15s, transform 0.05s, border-color 0.15s;
+    }
+    .option-btn span.label {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      margin-right: 8px;
+      background: #eef2ff;
+      color: #4338ca;
+    }
+    .option-btn:hover {
+      background: #f3f4ff;
+      border-color: #a5b4fc;
+    }
+    .option-btn.selected {
+      background: #e0e7ff;
+      border-color: #4f46e5;
+    }
+    .option-btn.correct {
+      background: #dcfce7;
+      border-color: #16a34a;
+    }
+    .option-btn.wrong {
+      background: #fee2e2;
+      border-color: #dc2626;
+    }
+    .controls {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button.primary {
+      flex: 1 1 120px;
+      border-radius: 999px;
+      border: none;
+      padding: 9px 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #4f46e5;
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+    }
+    button.primary:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+    button.secondary {
+      flex: 1 1 120px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      padding: 9px 14px;
+      font-size: 0.9rem;
+      background: #ffffff;
+      cursor: pointer;
+      color: #374151;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    button.secondary:hover {
+      background: #f3f4f6;
+      border-color: #9ca3af;
+    }
+    .result {
+      margin-top: 16px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      font-size: 0.95rem;
+    }
+    .score-main {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .score-detail {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+    @media (max-width: 480px) {
+      .quiz-wrapper {
+        padding: 16px 12px 18px;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      h1 { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-wrapper">
+    <h1>Тест по математике</h1>
+    <div class="subtitle">1 класс • усложнённый уровень</div>
+    <div class="progress" id="progress"></div>
+
+    <div class="question-box">
+      <div class="question-text" id="questionText"></div>
+      <div class="note" id="questionNote"></div>
+      <div class="options" id="optionsContainer"></div>
+    </div>
+
+    <div class="controls">
+      <button class="secondary" id="prevBtn">← Назад</button>
+      <button class="primary" id="nextBtn">Дальше →</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none;">
+      <div class="score-main" id="scoreMain"></div>
+      <div class="score-detail" id="scoreDetail"></div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        text: "Реши пример: 8 + 5 = ?",
+        note: "Подумай: до 10 не хватает 2, значит 8 + 2 = 10, осталось добавить ещё 3.",
+        options: ["11", "12", "13", "14"],
+        correctIndex: 2
+      },
+      {
+        text: "Реши пример: 15 − 7 = ?",
+        note: "Можно сначала вычесть 5 до 10, потом ещё 2.",
+        options: ["6", "7", "8", "9"],
+        correctIndex: 2
+      },
+      {
+        text: "Какое число нужно поставить: 9 + ? = 14",
+        note: "Подумай, сколько не хватает от 9 до 14.",
+        options: ["4", "5", "6", "7"],
+        correctIndex: 1
+      },
+      {
+        text: "Какое число нужно поставить: ? − 6 = 9",
+        note: "Это обратная задача: 9 + 6 = ?",
+        options: ["13", "14", "15", "16"],
+        correctIndex: 2
+      },
+      {
+        text: "У Маши было 6 яблок. Мама дала ещё 7. Сколько стало яблок?",
+        note: "Сначала можно сделать 6 + 4 = 10, потом добавить ещё 3.",
+        options: ["11", "12", "13", "14"],
+        correctIndex: 2
+      },
+      {
+        text: "На ветке сидело 12 птиц. 5 улетели. Сколько осталось?",
+        note: "Можно считать: 12 − 2 = 10 и ещё −3.",
+        options: ["6", "7", "8", "9"],
+        correctIndex: 1
+      },
+      {
+        text: "Выбери выражение, которое больше 10.",
+        note: "Сравни результаты.",
+        options: ["5 + 4", "7 + 3", "8 + 4", "9 − 1"],
+        correctIndex: 2
+      },
+      {
+        text: "Какое число лишнее: 9, 10, 11, 13, 12?",
+        note: "Посмотри, как числа идут по порядку.",
+        options: ["9", "10", "11", "13"],
+        correctIndex: 3
+      },
+      {
+        text: "У Коли 3 красных карандаша и 8 синих. Сколько всего карандашей?",
+        note: "Сложи красные и синие.",
+        options: ["10", "11", "12", "13"],
+        correctIndex: 1
+      },
+      {
+        text: "В классе 18 учеников. 9 ушли в столовую. Сколько осталось в классе?",
+        note: "Подумавай, сколько раз по 9 помещается в 18.",
+        options: ["7", "8", "9", "10"],
+        correctIndex: 2
+      }
+    ];
+
+    let currentIndex = 0;
+    const userAnswers = new Array(questions.length).fill(null);
+
+    const progressEl = document.getElementById('progress');
+    const questionTextEl = document.getElementById('questionText');
+    const questionNoteEl = document.getElementById('questionNote');
+    const optionsContainerEl = document.getElementById('optionsContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultBox = document.getElementById('resultBox');
+    const scoreMain = document.getElementById('scoreMain');
+    const scoreDetail = document.getElementById('scoreDetail');
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      progressEl.textContent = `Вопрос ${currentIndex + 1} из ${questions.length}`;
+      questionTextEl.textContent = q.text;
+      questionNoteEl.textContent = q.note;
+
+      optionsContainerEl.innerHTML = '';
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'option-btn';
+        if (userAnswers[currentIndex] === idx) {
+          btn.classList.add('selected');
+        }
+        btn.innerHTML = `<span class="label">${String.fromCharCode(65 + idx)}</span> ${opt}`;
+        btn.addEventListener('click', () => {
+          userAnswers[currentIndex] = idx;
+          Array.from(optionsContainerEl.children).forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+        });
+        optionsContainerEl.appendChild(btn);
+      });
+
+      prevBtn.disabled = currentIndex === 0;
+      if (currentIndex === questions.length - 1) {
+        nextBtn.textContent = 'Показать результат';
+      } else {
+        nextBtn.textContent = 'Дальше →';
+      }
+    }
+
+    function showResult() {
+      let correct = 0;
+      questions.forEach((q, i) => {
+        if (userAnswers[i] === q.correctIndex) correct++;
+      });
+      const total = questions.length;
+      const percent = Math.round((correct / total) * 100);
+
+      let comment;
+      if (percent === 100) {
+        comment = "Отлично! Все ответы верные — можно давать ещё более сложные задачи.";
+      } else if (percent >= 80) {
+        comment = "Очень хорошо! Пара ошибок — отличный повод ещё раз прорешать похожие примеры.";
+      } else if (percent >= 50) {
+        comment = "Неплохо, но стоит потренироваться: особенно примеры с переходом через десяток.";
+      } else {
+        comment = "Лучше попробовать ещё раз и порешать примеры по шагам, проговаривая каждое действие.";
+      }
+
+      scoreMain.textContent = `Правильных ответов: ${correct} из ${total} (${percent}%)`;
+      scoreDetail.textContent = comment;
+      resultBox.style.display = 'block';
+
+      // Подсветка правильных/неправильных вариантов
+      const q = questions[currentIndex];
+      Array.from(optionsContainerEl.children).forEach((btn, idx) => {
+        btn.classList.remove('selected');
+        if (idx === q.correctIndex) {
+          btn.classList.add('correct');
+        } else if (userAnswers[currentIndex] === idx) {
+          btn.classList.add('wrong');
+        }
+      });
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex === questions.length - 1) {
+        showResult();
+      } else {
+        currentIndex++;
+        renderQuestion();
+      }
+    });
+
+    renderQuestion();
+  </script>
+</body>
+</html>
