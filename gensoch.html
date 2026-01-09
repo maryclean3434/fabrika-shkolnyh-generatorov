@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Генератор сочинения: Зимние каникулы</title>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 600px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 20px 18px 22px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+    }
+
+    .app-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #111827;
+    }
+
+    .app-subtitle {
+      font-size: 13px;
+      text-align: center;
+      margin-bottom: 16px;
+      color: #6b7280;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #374151;
+    }
+
+    input {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.25);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+      margin-bottom: 14px;
+    }
+
+    button {
+      flex: 1;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.1s ease, background 0.15s ease;
+    }
+
+    .btn-main {
+      background: #0ea5e9;
+      color: #ffffff;
+      box-shadow: 0 8px 16px rgba(14, 165, 233, 0.4);
+    }
+
+    .btn-main:hover {
+      background: #0284c7;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(2, 132, 199, 0.45);
+    }
+
+    .btn-main:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 8px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn-ghost {
+      background: #e0f2fe;
+      color: #0369a1;
+      box-shadow: none;
+    }
+
+    .btn-ghost:hover { background: #bae6fd; }
+
+    .essay-box {
+      margin-top: 4px;
+      padding: 12px 12px 14px;
+      border-radius: 14px;
+      background: #f9fafb;
+      border: 1px dashed #d1d5db;
+      min-height: 140px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #111827;
+      display: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .essay-box::before {
+      content: "❄️";
+      position: absolute;
+      font-size: 18px;
+      opacity: 0.7;
+      right: 10px;
+      top: 8px;
+    }
+
+    .essay-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    .essay-text { white-space: pre-wrap; }
+
+    .note {
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 480px) {
+      .app { padding: 18px 14px 18px; border-radius: 16px; }
+      .app-title { font-size: 18px; }
+      input { font-size: 15px; padding: 10px 11px; }
+      button { font-size: 14px; }
+      .essay-box { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1 class="app-title">Генератор сочинения: Зимние каникулы</h1>
+    <p class="app-subtitle">
+      Получи вариант сочинения с вступлением, основной частью и небольшим выводом.
+    </p>
+
+    <div class="form-row">
+      <label for="name">Как тебя зовут?</label>
+      <input id="name" type="text" placeholder="Например: Аня" />
+    </div>
+
+    <div class="form-row">
+      <label for="city">Город или село</label>
+      <input id="city" type="text" placeholder="Например: Казань" />
+    </div>
+
+    <div class="buttons">
+      <button class="btn-main" id="generateBtn">Сгенерировать сочинение</button>
+      <button class="btn-ghost" id="randomBtn">Заполнить за меня</button>
+    </div>
+
+    <div class="essay-box" id="essayBox">
+      <div class="essay-title">Черновик сочинения</div>
+      <div class="essay-text" id="essayText"></div>
+    </div>
+
+    <p class="note">
+      Можно переписать от руки, немного подредактировать и добавить свои детали.
+    </p>
+  </div>
+
+  <script>
+    const nameInput = document.getElementById("name");
+    const cityInput = document.getElementById("city");
+    const generateBtn = document.getElementById("generateBtn");
+    const randomBtn = document.getElementById("randomBtn");
+    const essayBox = document.getElementById("essayBox");
+    const essayText = document.getElementById("essayText");
+
+    const randomNames = ["Аня", "Миша", "Лена", "Тимур", "Айгуль"];
+    const randomCities = ["Казань", "Москва", "Санкт-Петербург", "Екатеринбург", "Новосибирск"];
+
+    const introSentences = [
+      "Зимние каникулы — это время, которого я всегда жду с особым нетерпением.",
+      "К зимним каникулам я отношусь особенно тепло, потому что это самые сказочные дни в году.",
+      "Зимние каникулы для меня — это маленький отдых от учёбы и большая возможность провести время с близкими.",
+      "Каждый год я заранее придумываю, как проведу зимние каникулы, потому что они всегда пролетает очень быстро.",
+      "Зимние каникулы — это не только отдых от уроков, но и новые впечатления, встречи и маленькие открытия."
+    ];
+
+    const weatherSentences = [
+      "В этом году зима выдалась настоящей: было много снега, инея на деревьях и холодного, но свежего воздуха.",
+      "За окном почти каждый день падал тихий снег, и наш двор выглядел как кадр из новогодней открытки.",
+      "На улице часто стоял мороз, и, выходя на прогулку, приходилось надевать тёплую шапку, шарф и варежки.",
+      "Иногда мороз был таким сильным, что стекла в окнах покрывались узорами, похожими на волшебные рисунки.",
+      "Погода менялась, но почти всегда оставалась по-зимнему красивой: то яркое солнце, то мягкий снегопад."
+    ];
+
+    const familyActivities = [
+      "Часть каникул я провёл(а) дома с семьёй: мы смотрели фильмы, пили горячий чай и долго разговаривали обо всём на свете.",
+      "Много времени я проводил(а) с родителями и родственниками: мы вместе готовили вкусные блюда и вспоминали забавные истории.",
+      "Дома часто звучал смех: мы играли в настольные игры, обсуждали прошедший год и строили планы на новый.",
+      "Особенно мне запомнились тихие вечера дома, когда вся семья собиралась за одним столом и делилась впечатлениями.",
+      "Мы с семьёй старались проводить больше времени вместе, и именно это делало зимние каникулы по-настоящему тёплыми."
+    ];
+
+    const outdoorActivities = [
+      "Когда выдавалась хорошая погода, я выходил(а) во двор: катался(ась) с горки, лепил(а) снеговика и играл(а) в снежки с друзьями.",
+      "Я несколько раз ходил(а) с друзьями кататься на коньках, и, хотя иногда падал(а), всё равно получал(а) огромное удовольствие.",
+      "Мы с ребятами устраивали настоящие снежные битвы, строили крепости из снега и возвращались домой с красными, но довольными лицами.",
+      "Иногда я просто гулял(а) по зимним улицам " + "ГОРОД" + ", слушал(а) хруст снега под ногами и наслаждался(ась) зимней тишиной.",
+      "Были дни, когда мы всей компанией катались на тюбингах и смеялись так громко, что, казалось, нас слышит весь район."
+    ];
+
+    const newYearSentences = [
+      "Особое место в моих зимних каникулах заняла встреча Нового года: мы нарядили ёлку, украсили дом и подготовили праздничный стол.",
+      "Новый год мы встречали всей семьёй: горели гирлянды, играла музыка, а за окном тихо падал снег.",
+      "Перед боем курантов мы загадали желания, и я очень надеюсь, что хотя бы одно из них обязательно сбудется.",
+      "Больше всего мне понравилось ощущение праздника: огоньки на ёлке, запах мандаринов и искры бенгальских огней.",
+      "Когда пробили куранты, мы поздравили друг друга, обменялись подарками и ещё долго не могли разойтись спать."
+    ];
+
+    const reflectionSentences = [
+      "Эти каникулы помогли мне отдохнуть от школьных забот и набраться сил перед новой четвертью.",
+      "За время зимних каникул я успел(а) не только повеселиться, но и немного подумать о своих целях на будущий год.",
+      "Я понял(а), как важно ценить моменты, проведённые с близкими, потому что именно они делают каникулы особенными.",
+      "Эти дни показали мне, что отдых может быть не только полезным, но и очень запоминающимся.",
+      "Я постарался(ась) провести каникулы так, чтобы потом было приятно вспоминать каждый их день."
+    ];
+
+    const endingSentences = [
+      "В целом мои зимние каникулы прошли интересно и насыщенно, и теперь я с новыми силами готов(а) вернуться к учёбе.",
+      "Я считаю, что эти зимние каникулы удались, потому что я хорошо отдохнул(а) и получил(а) много ярких впечатлений.",
+      "Эти зимние каникулы запомнятся мне надолго, и я уже с нетерпением жду, какими будут следующие.",
+      "Я благодарен(на) за то, как прошли мои зимние каникулы, и надеюсь, что новый учебный период будет не менее удачным.",
+      "Так закончились мои зимние каникулы, но воспоминания о них ещё долго будут согревать меня даже в самые холодные дни."
+    ];
+
+    function randomFrom(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function buildEssay(name, city) {
+      const intro = randomFrom(introSentences);
+      const weather = randomFrom(weatherSentences);
+      const family = randomFrom(familyActivities);
+      const outdoorTemplate = randomFrom(outdoorActivities);
+      const outdoor = outdoorTemplate.replace(/ГОРОД/g, city);
+      const newYearPart = randomFrom(newYearSentences);
+      const reflection = randomFrom(reflectionSentences);
+      const ending = randomFrom(endingSentences);
+
+      const firstLine = "Меня зовут " + name + ", и этой зимой я проводил(а) каникулы в городе " + city + ".";
+      // Структура как у школьного сочинения: вступление + основная часть + вывод.
+      const text =
+        firstLine + " " +
+        intro + " " +
+        weather + " " +
+        family + " " +
+        outdoor + " " +
+        newYearPart + " " +
+        reflection + " " +
+        ending;
+
+      return text;
+    }
+
+    generateBtn.addEventListener("click", () => {
+      let name = nameInput.value.trim();
+      let city = cityInput.value.trim();
+
+      if (!name) name = randomFrom(randomNames);
+      if (!city) city = randomFrom(randomCities);
+
+      const essay = buildEssay(name, city);
+
+      essayText.textContent = essay;
+      essayBox.style.display = "block";
+      essayBox.style.opacity = "0";
+      essayBox.style.transform = "translateY(4px)";
+      requestAnimationFrame(() => {
+        essayBox.style.transition = "opacity 0.18s ease, transform 0.18s ease";
+        essayBox.style.opacity = "1";
+        essayBox.style.transform = "translateY(0)";
+      });
+    });
+
+    randomBtn.addEventListener("click", () => {
+      nameInput.value = randomFrom(randomNames);
+      cityInput.value = randomFrom(randomCities);
+    });
+  </script>
+</body>
+</html>
