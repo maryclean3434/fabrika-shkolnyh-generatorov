@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мастер изложений: Профессионал</title>
+  <style>
+    :root { --primary: #2c3e50; --accent: #27ae60; --bg: #f4f7f6; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+    .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    h1 { text-align: center; color: var(--primary); font-size: 24px; margin-bottom: 30px; }
+    textarea { width: 100%; height: 200px; padding: 15px; border: 2px solid #eaeeef; border-radius: 8px; font-size: 16px; line-height: 1.6; box-sizing: border-box; resize: none; outline: none; transition: 0.3s; }
+    textarea:focus { border-color: var(--accent); }
+    .controls { margin: 25px 0; text-align: center; }
+    .btn { background: var(--accent); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2); }
+    .btn:hover { background: #219150; transform: translateY(-2px); }
+    .result-wrap { background: #fdfdfd; padding: 25px; border-radius: 8px; border: 1px solid #eee; margin-top: 20px; }
+    #resultText { font-size: 17px; line-height: 1.8; white-space: pre-wrap; transition: opacity 0.5s; }
+    .status-bar { margin-top: 15px; display: flex; justify-content: space-between; font-size: 13px; color: #7f8c8d; font-weight: bold; }
+    .copy-btn { background: none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>✍️ Мастер сжатого изложения</h1>
+  <textarea id="source" placeholder="Вставьте текст для сжатия..."></textarea>
+  
+  <div class="controls">
+    <button class="btn" onclick="makeSummary()">Сжать (110–150 слов)</button>
+  </div>
+
+  <div class="result-wrap">
+    <div id="resultText">Здесь появится ваше изложение...</div>
+    <div class="status-bar">
+      <span id="wordCounter">Слов: 0</span>
+      <button class="copy-btn" onclick="copyResult()">Скопировать</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function makeSummary() {
+    const input = document.getElementById('source').value.trim();
+    if (input.length < 100) return alert("Текст слишком короткий!");
+
+    // 1. Разбиваем на предложения
+    const sentences = input.match(/[^.!?]+[.!?]+/g) || [input];
+    
+    let summary = [];
+    let wordsCount = 0;
+    const MIN = 110;
+    const MAX = 150;
+
+    // 2. Алгоритм сжатия: берем предложения из разных частей текста
+    // Всегда берем 1-е и последнее предложение для структуры
+    summary.push(sentences[0].trim());
+    wordsCount += getWords(sentences[0]);
+
+    // Проходим по остальным предложениям с шагом (пропуская часть текста)
+    let step = Math.max(1, Math.floor(sentences.length / 5)); 
+    
+    for (let i = 1; i < sentences.length - 1; i += step) {
+        let s = sentences[i].trim();
+        let sLen = getWords(s);
+
+        if (wordsCount + sLen <= MAX) {
+            summary.push(s);
+            wordsCount += sLen;
+        }
+        // Если уже набрали минимум — можем остановиться раньше
+        if (wordsCount >= MIN) break;
+    }
+
+    // Всегда пробуем добавить последнее предложение, если влезет
+    const lastS = sentences[sentences.length - 1].trim();
+    const lastLen = getWords(lastS);
+    if (wordsCount + lastLen <= MAX && !summary.includes(lastS)) {
+        summary.push(lastS);
+        wordsCount += lastLen;
+    }
+
+    // 3. Вывод
+    const out = document.getElementById('resultText');
+    out.style.opacity = 0;
+    setTimeout(() => {
+        const finalString = summary.join(' ');
+        out.innerText = finalString;
+        document.getElementById('wordCounter').innerText = `Слов: ${getWords(finalString)} (Диапазон 110-150)`;
+        out.style.opacity = 1;
+    }, 200);
+}
+
+function getWords(str) {
+    return str.split(/\s+/).filter(w => w.length > 0).length;
+}
+
+function copyResult() {
+    const t = document.getElementById('resultText').innerText;
+    navigator.clipboard.writeText(t);
+    alert('Готово!');
+}
+</script>
+</body>
+</html>
